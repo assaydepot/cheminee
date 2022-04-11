@@ -1,14 +1,38 @@
 use std::path::Path;
+use clap::error::ContextValue::Number;
 use tantivy::directory::MmapDirectory;
 use tantivy::schema::*;
 use tantivy::{Index, IndexBuilder};
+use tantivy::chrono::format::Item::Numeric;
 
 pub use tantivy::doc;
 
 pub fn schema() -> Schema {
     let mut builder = SchemaBuilder::new();
+
+    let score_options = NumericOptions::default()
+        .set_indexed()
+        .set_fieldnorm()
+        .set_fast(Cardinality::SingleValue);
     builder.add_text_field("smile", TEXT | STORED);
     builder.add_json_field("descriptors", TEXT | STORED);
+    builder.add_text_field("smarts", TEXT | STORED);
+    builder.add_text_field("cxsmiles", TEXT | STORED);
+    builder.add_text_field("coords", TEXT | STORED);
+    builder.add_text_field("numatoms", TEXT | STORED);
+    builder.add_text_field("numbonds", TEXT | STORED);
+    builder.add_text_field("inchikey", TEXT | STORED);
+    builder.add_text_field("jsonMol", TEXT | STORED);
+    builder.add_text_field("CrippenClogP", TEXT | STORED);
+    // builder.add_f64_field("CrippenClogP", FAST | STORED);
+    // builder.add_f64_field("CrippenClogP", score_options);
+    builder.add_text_field("CrippenMR", TEXT | STORED);
+    builder.add_text_field("FractionCSP3", TEXT | STORED);
+    builder.add_text_field("chi0n", TEXT | STORED);
+    builder.add_text_field("kappa1", TEXT | STORED);
+    builder.add_text_field("kappa2", TEXT | STORED);
+    builder.add_text_field("kappa3", TEXT | STORED);
+    builder.add_text_field("labuteASA", TEXT | STORED);
 
     builder.build()
 }
@@ -19,7 +43,7 @@ pub fn create_index(p: impl AsRef<Path>) -> eyre::Result<(Schema, Index)> {
     let builder = IndexBuilder::new().schema(schema.clone());
 
     let index = builder.create_in_dir(p)?;
-
+    println!("{:?} schema {:?} index", schema, index);
     Ok((schema, index))
 }
 
