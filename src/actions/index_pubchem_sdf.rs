@@ -1,6 +1,9 @@
 use serde_json::Value;
 use super::prelude::*;
-
+use ndarray::arr2;
+// use petal_decomposition::{Pca, PcaBuilder};
+use smartcore::linalg::naive::dense_matrix::*;
+use smartcore::decomposition::pca::*;
 pub const NAME: &'static str = "index-pubchem-sdf";
 
 pub fn command() -> Command<'static> {
@@ -57,11 +60,12 @@ pub fn action(matches: &ArgMatches) -> eyre::Result<()> {
             let CrippenClogP = schema.get_field("CrippenClogP").unwrap();
             let CrippenMR = schema.get_field("CrippenMR").unwrap();
             let FractionCSP3 = schema.get_field("FractionCSP3").unwrap();
-            let chi0n = schema.get_field("chi0n").unwrap();
-            let kappa1 = schema.get_field("kappa1").unwrap();
-            let kappa2 = schema.get_field("kappa2").unwrap();
-            let kappa3 = schema.get_field("kappa3").unwrap();
-            let labuteASA = schema.get_field("labuteASA").unwrap();
+            // let chi0n = schema.get_field("chi0n").unwrap();
+            // let kappa1 = schema.get_field("kappa1").unwrap();
+            // let kappa2 = schema.get_field("kappa2").unwrap();
+            // let kappa3 = schema.get_field("kappa3").unwrap();
+            // let labuteASA = schema.get_field("labuteASA").unwrap();
+            let pca_smthg = schema.get_field("pca_smthg").unwrap();
 
             // println!("{:?} descriptors", descriptors);
             fn flatten<T>(nested: Vec<Vec<T>>) -> Vec<T> {
@@ -87,8 +91,10 @@ pub fn action(matches: &ArgMatches) -> eyre::Result<()> {
             let crip = json.as_object().unwrap()["CrippenMR"].clone();
             println!("{:?} crip ", crip);
             let fract = json.as_object().unwrap()["FractionCSP3"].clone();
-            let chi = json.as_object().unwrap()["chi0n"].clone();
+            let mut chi = json.as_object().unwrap()["chi0n"].clone();
             let k1 = json.as_object().unwrap()["kappa1"].clone();
+            println!("chi {:?} ", chi);
+            println!("chi js {:?} ", json!(chi).as_f64().unwrap());
             let k2 = json.as_object().unwrap()["kappa2"].clone();
             let k3 = json.as_object().unwrap()["kappa2"].clone();
             let lab = json.as_object().unwrap()["labuteASA"].clone();
@@ -96,6 +102,26 @@ pub fn action(matches: &ArgMatches) -> eyre::Result<()> {
 
             println!("{:?} smarts",mol.get_smarts("") );
             println!("{:?} get_cxsmiles",mol.get_cxsmiles("") );
+            // use serde_json::Value::Number;
+            use serde_json::json;
+            // use tantivy::f64_to_u64;
+            // use serde::de::Deserializer;
+            // let pca = PcaBuilder::new(1).build();
+            // let mut pca = PcaBuilder::new(2).build();
+            let x = DenseMatrix::from_2d_array(&[&[json!(chi).as_f64().unwrap(), json!(k1).as_f64().unwrap()]]);
+            let pca = PCA::fit(&x, PCAParameters::default().with_n_components(2)).unwrap(); // Reduce number of features to 2
+            let pca2 = pca.transform(&x).unwrap();
+            println!("pca2 {:?}", pca2);
+            // let x = arr2(&[[json!(chi).as_f64().unwrap(), json!(k1).as_f64().unwrap()]]);
+            // pca.fit(&x).unwrap();
+            // let mut pca = RandomizedPcaBuilder::new(1).build();
+            // let y = PcaBuilder::new(1).build().fit_transform(&x).unwrap();
+            // println!("pca fit y {:?} ", y);
+            // let s = pca.singular_values();            // [2_f64, 0_f64]
+            // let v = pca.explained_variance_ratio();   // [1_f64, 0_f64]
+            // // let y = pca.transform(&x).unwrap();
+            // let y = pca.fit_transform(&x).unwrap();
+            // let mut x = arr2(&[[0_f64, 0_f64], [1_f64, 1_f64], [2_f64, 2_f64]]);
             let doc = doc!(
                 smile => mol.get_smiles(""),
                 descriptors => json,
@@ -109,11 +135,13 @@ pub fn action(matches: &ArgMatches) -> eyre::Result<()> {
                 CrippenClogP => clog.to_string(),
                 CrippenMR => crip.to_string(),
                 FractionCSP3 => fract.to_string(),
-                chi0n => chi.to_string(),
-                kappa1 => k1.to_string(),
-                kappa2 => k2.to_string(),
-                kappa3 => k3.to_string(),
-                labuteASA => lab.to_string(),
+                // pca_smthg => y.abs()  ,
+                pca_smthg => 1.15  ,
+                // chi0n => json!(chi).as_f64().unwrap(),
+                // kappa1 => json!(k1).as_f64().unwrap(),
+                // kappa2 => json!(k2).as_f64().unwrap(),
+                // kappa3 => json!(k3).as_f64().unwrap(),
+                // labuteASA => json!(lab).as_f64().unwrap(),
         );
             println!("{:?} doc ", doc);
 

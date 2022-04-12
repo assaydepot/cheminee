@@ -28,11 +28,12 @@ pub fn schema() -> Schema {
     // builder.add_f64_field("CrippenClogP", score_options);
     builder.add_text_field("CrippenMR", TEXT | STORED);
     builder.add_text_field("FractionCSP3", TEXT | STORED);
-    builder.add_text_field("chi0n", TEXT | STORED);
-    builder.add_text_field("kappa1", TEXT | STORED);
-    builder.add_text_field("kappa2", TEXT | STORED);
-    builder.add_text_field("kappa3", TEXT | STORED);
-    builder.add_text_field("labuteASA", TEXT | STORED);
+    builder.add_f64_field("pca_smthg", score_options);
+    // builder.add_f64_field("chi0n", score_options);
+    // builder.add_f64_field("kappa1", FAST);
+    // builder.add_f64_field("kappa2", FAST);
+    // builder.add_f64_field("kappa3", FAST);
+    // builder.add_f64_field("labuteASA", FAST);
 
     builder.build()
 }
