@@ -2,7 +2,7 @@ FROM alpine
 
 RUN apk add --update \
       ca-certificates \
-      bash boost boost-dev llvm \
+      bash boost libblkid-dev e2fslibs-dev libboost-all-dev libaudit-dev boost-dev llvm \
       curl && \
       curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl  && \
       chmod +x ./kubectl  && \

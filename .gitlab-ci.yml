@@ -33,6 +33,7 @@ linux-musl:
     - echo $CI_BUILD_REF_NAME
     - time cargo clippy -- -Dwarnings --no-deps
     - time cargo fmt -- --check
+    - sleep 500
     - |
         if [[ $CI_BUILD_REF_NAME == "poking_around" ]]; then
           RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target x86_64-unknown-linux-musl
