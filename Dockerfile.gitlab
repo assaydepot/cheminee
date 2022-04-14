@@ -1,0 +1,12 @@
+FROM alpine
+
+RUN apk add --update \
+      ca-certificates \
+      bash \
+      curl && \
+      curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl  && \
+      chmod +x ./kubectl  && \
+      mv ./kubectl /usr/local/bin && \
+      rm -rf /var/cache/apk/*
+
+ADD target/aarch64-apple-darwin/release/cheminee /usr/bin/aarch64-apple-darwin
