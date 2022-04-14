@@ -35,7 +35,7 @@ linux-musl:
     - time cargo fmt -- --check
     - |
         if [[ $CI_BUILD_REF_NAME == "poking_around" ]]; then
-          RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target aarch64-apple-darwin
+          RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target aarch64-unknown-linux-musl
           du -hs target/release/*
           cachepot --show-stats
           aws ecr get-login --region=eu-central-1 | awk '{gsub(/ -e none/, ""); print}' | sh

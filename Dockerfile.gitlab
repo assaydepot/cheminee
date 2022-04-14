@@ -9,4 +9,4 @@ RUN apk add --update \
       mv ./kubectl /usr/local/bin && \
       rm -rf /var/cache/apk/*
 
-ADD target/aarch64-apple-darwin/release/cheminee /usr/bin/cheminee
+ADD target/aarch64-unknown-linux-musl/release/cheminee /usr/bin/cheminee
