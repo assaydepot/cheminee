@@ -16,24 +16,26 @@ pub fn schema() -> Schema {
         .set_fast(Cardinality::SingleValue);
     builder.add_text_field("smile", TEXT | STORED);
     builder.add_json_field("descriptors", TEXT | STORED);
+    builder.add_text_field("fragment_parent", TEXT | STORED);
+    builder.add_text_field("canonical_tautomer", TEXT | STORED);
     builder.add_text_field("smarts", TEXT | STORED);
     builder.add_text_field("cxsmiles", TEXT | STORED);
-    builder.add_text_field("coords", TEXT | STORED);
+    // builder.add_text_field("coords", TEXT | STORED);
     builder.add_text_field("numatoms", TEXT | STORED);
     builder.add_text_field("numbonds", TEXT | STORED);
     builder.add_text_field("inchikey", TEXT | STORED);
-    builder.add_text_field("jsonMol", TEXT | STORED);
-    builder.add_text_field("CrippenClogP", TEXT | STORED);
-    // builder.add_f64_field("CrippenClogP", FAST | STORED);
-    // builder.add_f64_field("CrippenClogP", score_options);
-    builder.add_text_field("CrippenMR", TEXT | STORED);
-    builder.add_text_field("FractionCSP3", TEXT | STORED);
-    builder.add_f64_field("pca_smthg", score_options);
-    // builder.add_f64_field("chi0n", score_options);
-    // builder.add_f64_field("kappa1", FAST);
-    // builder.add_f64_field("kappa2", FAST);
-    // builder.add_f64_field("kappa3", FAST);
-    // builder.add_f64_field("labuteASA", FAST);
+    // builder.add_text_field("jsonMol", TEXT | STORED);
+    // builder.add_text_field("CrippenClogP", TEXT | STORED);
+    // // builder.add_f64_field("CrippenClogP", FAST | STORED);
+    // // builder.add_f64_field("CrippenClogP", score_options);
+    // builder.add_text_field("CrippenMR", TEXT | STORED);
+    // builder.add_text_field("FractionCSP3", TEXT | STORED);
+    // builder.add_f64_field("pca_smthg", score_options);
+    builder.add_f64_field("chi0n", score_options);
+    builder.add_f64_field("kappa1", INDEXED);
+    builder.add_f64_field("kappa2", INDEXED);
+    builder.add_f64_field("kappa3", INDEXED);
+    builder.add_f64_field("labuteASA", INDEXED);
 
     builder.build()
 }
