@@ -3,7 +3,8 @@ use super::prelude::*;
 use rdkit_sys::molecule::Molecule;
 use rdkit_sys::MolBlockIter;
 
-pub const NAME: &'static str = "stream-pubchem-sdf";
+pub const NAME: &str = "stream-pubchem-sdf";
+// pub const NAME: &'static str = "stream-pubchem-sdf";
 
 pub fn command() -> Command<'static> {
     Command::new(NAME)

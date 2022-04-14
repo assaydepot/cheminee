@@ -1,9 +1,7 @@
 use std::path::Path;
-use clap::error::ContextValue::Number;
 use tantivy::directory::MmapDirectory;
 use tantivy::schema::*;
 use tantivy::{Index, IndexBuilder};
-use tantivy::chrono::format::Item::Numeric;
 
 pub use tantivy::doc;
 
@@ -35,7 +33,7 @@ pub fn schema() -> Schema {
     builder.add_f64_field("kappa1", INDEXED);
     builder.add_f64_field("kappa2", INDEXED);
     builder.add_f64_field("kappa3", INDEXED);
-    builder.add_f64_field("labuteASA", INDEXED);
+    builder.add_f64_field("labute_asa", INDEXED);
 
     builder.build()
 }

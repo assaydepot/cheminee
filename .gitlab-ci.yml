@@ -1,0 +1,48 @@
+image: 554546661178.dkr.ecr.eu-central-1.amazonaws.com/rust-musl:nightly-2022-02-07
+
+services:
+  - 554546661178.dkr.ecr.eu-central-1.amazonaws.com/docker:stable-dind-2
+
+stages:
+  - build
+
+variables:
+  KUBERNETES_SERVICE_ACCOUNT_OVERWRITE: gitlab-cheminee
+  CARGO_HOME: $CI_PROJECT_DIR/cargo
+  S3_CACHE_BUCKET: scientist-gitlab-cache
+  S3_CACHE_PATH: gitlab_runner
+  S3_CACHE_TAR_NAME: cheminee.tar.gz
+  REPO: 554546661178.dkr.ecr.eu-central-1.amazonaws.com/cheminee
+  DOCKER_HOST: tcp://localhost:2375
+  CARGO_INCREMENTAL: "false" # for cachepot
+  RUSTC_WRAPPER: /home/rust/.cargo/bin/cachepot
+  CACHEPOT_BUCKET: scientist-gitlab-cache
+  CACHEPOT_REGION: eu-central-1
+  CACHEPOT_S3_KEY_PREFIX: gitlab_runner/cheminee/sccache
+  CACHEPOT_ENDPOINT: scientist-gitlab-cache.s3.eu-central-1.amazonaws.com
+  CACHEPOT_ERROR_LOG: /tmp/sccache_log.txt
+  CACHEPOT_LOG: error
+
+linux-musl:
+  stage: build
+#  only:
+#    - master
+  script:
+    - rustc --version; cargo fmt --version
+    - aws configure list
+    - echo $CI_BUILD_REF_NAME
+    - time cargo clippy -- -Dwarnings --no-deps
+    - time cargo fmt -- --check
+    - |
+        if [[ $CI_BUILD_REF_NAME == "poking_around" ]]; then
+          RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target x86_64-unknown-linux-musl
+          du -hs target/release/*
+          cachepot --show-stats
+          aws ecr get-login --region=eu-central-1 | awk '{gsub(/ -e none/, ""); print}' | sh
+          export TAG=$(git rev-parse HEAD)
+          docker build -t $REPO:$TAG -f Dockerfile.gitlab .
+          docker push $REPO:$TAG
+          docker tag $REPO:$TAG $REPO:latest
+          docker push $REPO:latest
+          echo $TAG
+        fi

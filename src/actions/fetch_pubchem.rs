@@ -1,7 +1,8 @@
 use super::prelude::*;
 use crate::pubchem::down_all_current_sdf;
 
-pub const NAME: &'static str = "fetch-pubchem";
+pub const NAME: &str = "fetch-pubchem";
+// pub const NAME: &'static str = "fetch-pubchem";
 
 pub fn command() -> Command<'static> {
     Command::new(NAME).arg(

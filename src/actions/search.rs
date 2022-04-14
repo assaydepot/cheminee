@@ -2,7 +2,8 @@ pub use super::prelude::*;
 use tantivy::collector::TopDocs;
 use tantivy::query::QueryParser;
 
-pub const NAME: &'static str = "search";
+pub const NAME: &str = "search";
+// pub const NAME: &'static str = "search";
 
 pub fn command() -> Command<'static> {
     Command::new(NAME)

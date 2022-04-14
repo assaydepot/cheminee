@@ -23,7 +23,7 @@ pub async fn down_all_current_sdf(p: impl AsRef<Path>) -> eyre::Result<()> {
         .map(|m| {
             m.strip_prefix("<a href=\"")
                 .unwrap()
-                .strip_suffix("\"")
+                .strip_suffix('\"')
                 .unwrap()
         })
         .collect::<Vec<_>>();

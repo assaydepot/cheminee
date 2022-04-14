@@ -1,15 +1,7 @@
-use std::ffi::CString;
-use serde_json::Value;
 use super::prelude::*;
-use ndarray::arr2;
-// use petal_decomposition::{Pca, PcaBuilder};
-use smartcore::linalg::naive::dense_matrix::*;
-use smartcore::decomposition::pca::*;
-use linfa::traits::{Fit, Predict};
-use linfa_reduction::Pca as linfa_pca;
-use rdkit_sys::molecule::JsonMolecule;
 
-pub const NAME: &'static str = "index-pubchem-sdf";
+pub const NAME: &str = "index-pubchem-sdf";
+// pub const NAME: &'static str = "index-pubchem-sdf";
 
 pub fn command() -> Command<'static> {
     Command::new(NAME)
@@ -47,170 +39,98 @@ pub fn action(matches: &ArgMatches) -> eyre::Result<()> {
 
     let mut index_writer = index.writer_with_num_threads(1, 50 * 1024 * 1024)?;
 
-        for mol_block in mol_iter {
-            let mut mol = match Molecule::new(&mol_block, "") {
-                Some(m) => m,
-                None => continue,
-            };
-            println!("mol {:?}", mol);
-            // println!("{:?}  get_qmol", mol.get_qmol(""));
-            mol.cleanup("");
-            println!("mol  cleanup {:?}", mol);
-            // println!("{:?}  get_qmol", mol.get_qmol(""));
-            // println!("mol  reionize {:?}", mol.reionize(""));
-            // println!("mol  canonical_tautomer {:?}", mol.canonical_tautomer(""));
-            // println!("{:?} parent fragment", mol.fragment_parent(""));
-            mol.fragment_parent("");
-            println!("{:?} mol after parent", mol);
-            // println!("{:?}  get_rdkit_fp", mol.get_rdkit_fp(""));
-            // println!("{:?}  get_pattern_fp", mol.get_pattern_fp(""));
-            // println!("{:?}  get_pattern_fp_as_bytes", mol.get_pattern_fp_as_bytes(""));
-            // parent_clean_mol.reionize("");
-            // println!("reionize {:?}", mol.reionize(""));
-            // println!("neutralize {:?}", mol.neutralize(""));
-            mol.neutralize("");
-            println!("{:?} mol after neutralize", mol);
-            mol.canonical_tautomer("");
-            // println!("canonical  {:?}", mol.canonical_tautomer(""));
-            println!("{:?} mol after canonical", mol);
+    for mol_block in mol_iter {
+        let mut mol = match Molecule::new(&mol_block, "") {
+            Some(m) => m,
+            None => continue,
+        };
+        println!("mol {:?}", mol);
+        mol.cleanup("");
+        mol.neutralize("");
+        mol.reionize("");
+        println!("mol  cleanup {:?}", mol);
 
-            // println!("canonical  {:?}", mol.canonical_tautomer(""));
-            // println!("mol  fragment_parent {:?}", mol.fragment_parent(""));
+        mol.fragment_parent("");
+        let fr_parent = mol.get_smiles("");
+        mol.canonical_tautomer("");
+        let canonical = mol.get_smiles("");
+        println!("{:?} mol after canonical", mol);
 
-            let smile = schema.get_field("smile").unwrap();
-            let descriptors = schema.get_field("descriptors").unwrap();
-            let fragment_parent = schema.get_field("fragment_parent").unwrap();
-            let canonical_tautomer = schema.get_field("canonical_tautomer").unwrap();
-            let smarts = schema.get_field("smarts").unwrap();
-            let cxsmiles = schema.get_field("cxsmiles").unwrap();
-            // let coords = schema.get_field("coords").unwrap();
-            let numbonds = schema.get_field("numbonds").unwrap();
-            let numatoms = schema.get_field("numatoms").unwrap();
-            let inchikey = schema.get_field("inchikey").unwrap();
-            // let jsonMol = schema.get_field("jsonMol").unwrap();
-            // let CrippenClogP = schema.get_field("CrippenClogP").unwrap();
-            // let CrippenMR = schema.get_field("CrippenMR").unwrap();
-            // let FractionCSP3 = schema.get_field("FractionCSP3").unwrap();
-            let chi0n = schema.get_field("chi0n").unwrap();
-            let kappa1 = schema.get_field("kappa1").unwrap();
-            let kappa2 = schema.get_field("kappa2").unwrap();
-            let kappa3 = schema.get_field("kappa3").unwrap();
-            let labuteASA = schema.get_field("labuteASA").unwrap();
+        let smile = schema.get_field("smile").unwrap();
+        let descriptors = schema.get_field("descriptors").unwrap();
+        let fragment_parent = schema.get_field("fragment_parent").unwrap();
+        let canonical_tautomer = schema.get_field("canonical_tautomer").unwrap();
+        let smarts = schema.get_field("smarts").unwrap();
+        let cxsmiles = schema.get_field("cxsmiles").unwrap();
+        // let coords = schema.get_field("coords").unwrap();
+        let numbonds = schema.get_field("numbonds").unwrap();
+        let numatoms = schema.get_field("numatoms").unwrap();
+        let inchikey = schema.get_field("inchikey").unwrap();
+        // let jsonMol = schema.get_field("jsonMol").unwrap();
+        // let CrippenClogP = schema.get_field("CrippenClogP").unwrap();
+        // let CrippenMR = schema.get_field("CrippenMR").unwrap();
+        // let FractionCSP3 = schema.get_field("FractionCSP3").unwrap();
+        let chi0n = schema.get_field("chi0n").unwrap();
+        let kappa1 = schema.get_field("kappa1").unwrap();
+        let kappa2 = schema.get_field("kappa2").unwrap();
+        let kappa3 = schema.get_field("kappa3").unwrap();
+        let labute_asa = schema.get_field("labuteASA").unwrap();
 
-            // println!("{:?} descriptors", descriptors);
-            fn flatten<T>(nested: Vec<Vec<T>>) -> Vec<T> {
-                nested.into_iter().flatten().collect()
-            }
+        // println!("{:?} descriptors", descriptors);
+        // fn flatten<T>(nested: Vec<Vec<T>>) -> Vec<T> {
+        //     nested.into_iter().flatten().collect()
+        // }
+        //
+        let json: serde_json::Value = serde_json::from_str(&mol.get_descriptors())?;
+        // println!("{:?} json", json);
+        let json_mol_bonds = mol.get_JsonMolecule().bonds.len();
+        // println!("{:?} jsonMolBonds", jsonMolBonds);
+        let json_mol_atoms = mol.get_JsonMolecule().atoms.len();
+        // println!("{:?} jsonMolAtoms", jsonMolAtoms);
+        // // let coord = (mol.get_coords().iter().map(|c| c.clone()).collect::<Vec<f32>>());
+        // let coord = flatten(mol.get_coords()).clone();
+        // println!("{:?} coord", coord);
+        // // let clog = json.get("CrippenClogP").unwrap().clone();
+        // let mut clog = json.as_object().unwrap()["CrippenClogP"].clone();
+        //
+        // println!("{:?} clog ", clog);
+        // for (name, obj) in json.as_object().unwrap().iter() {
+        //     println!("{} is {:?}", name, obj);
+        // }
 
-            let json: serde_json::Value = serde_json::from_str(&mol.get_descriptors())?;
-            println!("{:?} json", json);
-            let jsonMolBonds = (&mol.get_JsonMolecule()).bonds.len();
-            println!("{:?} jsonMolBonds", jsonMolBonds);
-            let jsonMolAtoms = (&mol.get_JsonMolecule()).atoms.len();
-            println!("{:?} jsonMolAtoms", jsonMolAtoms);
-            // let coord = (mol.get_coords().iter().map(|c| c.clone()).collect::<Vec<f32>>());
-            let coord = flatten(mol.get_coords()).clone();
-            println!("{:?} coord", coord);
-            // let clog = json.get("CrippenClogP").unwrap().clone();
-            let mut clog = json.as_object().unwrap()["CrippenClogP"].clone();
+        let chi = json.as_object().unwrap()["chi0n"].clone();
+        let k1 = json.as_object().unwrap()["kappa1"].clone();
+        let k2 = json.as_object().unwrap()["kappa2"].clone();
+        let k3 = json.as_object().unwrap()["kappa2"].clone();
+        let lab = json.as_object().unwrap()["labuteASA"].clone();
 
-            println!("{:?} clog ", clog);
-            for (name, obj) in json.as_object().unwrap().iter() {
-                println!("{} is {:?}", name, obj);
-            }
-//
-//             let crip = json.as_object().unwrap()["CrippenMR"].clone();
-//             println!("{:?} crip ", crip);
-//             let fract = json.as_object().unwrap()["FractionCSP3"].clone();
-            let mut chi = json.as_object().unwrap()["chi0n"].clone();
-            let k1 = json.as_object().unwrap()["kappa1"].clone();
-//             println!("chi {:?} ", chi);
-//             println!("chi js {:?} ", json!(chi).as_f64().unwrap());
-            let k2 = json.as_object().unwrap()["kappa2"].clone();
-            let k3 = json.as_object().unwrap()["kappa2"].clone();
-            let lab = json.as_object().unwrap()["labuteASA"].clone();
-//             println!("{:?} chi {:?} kappa1 {:} kappa2 {:?} lab" , chi, k1, k2, lab);
-//
-//             println!("{:?} smarts",mol.get_smarts("") );
-//             println!("{:?} get_cxsmiles",mol.get_cxsmiles("") );
-            // use serde_json::Value::Number;
-            use serde_json::json;
-            // println!("get_qmol {:?} ", mol.get_molblock());
-            // use tantivy::f64_to_u64;
-            // use serde::de::Deserializer;
-            // let pca = PcaBuilder::new(1).build();
-            // let mut pca = PcaBuilder::new(2).build();
-            // let x = DenseMatrix::from_2d_array(&[&[json!(chi).as_f64().unwrap(), json!(k1).as_f64().unwrap()]]);
-            // let pca = PCA::fit(&x, PCAParameters::default().with_n_components(2)).unwrap(); // Reduce number of features to 2
-            // let pca2 = pca.transform(&x).unwrap();
-            // println!("pca2 {:?}", pca2);
-            // let x = arr2(&[[json!(chi).as_f64().unwrap(), json!(k1).as_f64().unwrap()]]);
-            // pca.fit(&x).unwrap();
-            // let mut pca = RandomizedPcaBuilder::new(1).build();
-            // let y = PcaBuilder::new(1).build().fit_transform(&x).unwrap();
-            // println!("pca fit y {:?} ", y);
-            // let s = pca.singular_values();            // [2_f64, 0_f64]
-            // let v = pca.explained_variance_ratio();   // [1_f64, 0_f64]
-            // // let y = pca.transform(&x).unwrap();
-            // let y = pca.fit_transform(&x).unwrap();
-            // let mut x = arr2(&[[0_f64, 0_f64], [1_f64, 1_f64], [2_f64, 2_f64]]);
-            mol.fragment_parent("");
-            // let fp = json!(mol.get_smiles("")).clone();
-            let fp = mol.get_smiles("");
-            println!("{:?} fp", fp);
-            mol.canonical_tautomer("");
-            // let cc = json!(mol.get_smiles("")).clone();
-            let cc = mol.get_smiles("");
-            println!("{:?} can ", cc);
-            let doc = doc!(
+        use serde_json::json;
+
+        let doc = doc!(
                 smile => mol.get_smiles(""),
                 descriptors => json,
-                fragment_parent => fp,
-                canonical_tautomer => cc,
+                fragment_parent => fr_parent,
+                canonical_tautomer => canonical,
                 smarts => mol.get_smarts(""),
                 cxsmiles => mol.get_cxsmiles(""),
-                // coords => format!("{:?}", coord).as_str(), //.flatten().join(", "),
-                numatoms => jsonMolAtoms.to_string().as_str(),
-                numbonds => jsonMolBonds.to_string().as_str(),
+                numatoms => json_mol_atoms.to_string().as_str(),
+                numbonds => json_mol_bonds.to_string().as_str(),
                 inchikey => mol.get_inchikey(""),
-                // jsonMol => &*mol.get_JsonMolecule().name.as_str(),
-                // CrippenClogP => clog.to_string(),
-                // CrippenMR => crip.to_string(),
-                // FractionCSP3 => fract.to_string(),
-                // // pca_smthg => y.abs()  ,
-                // pca_smthg => 1.15  ,
                 chi0n => json!(chi).as_f64().unwrap(),
                 kappa1 => json!(k1).as_f64().unwrap(),
                 kappa2 => json!(k2).as_f64().unwrap(),
                 kappa3 => json!(k3).as_f64().unwrap(),
-                labuteASA => json!(lab).as_f64().unwrap(),
+                labute_asa => json!(lab).as_f64().unwrap(),
         );
-            println!("{:?} doc ", doc);
+        // println!("{:?} doc ", doc);
 
-            index_writer.add_document(doc)?;
-        }
+        index_writer.add_document(doc)?;
+    }
 
     index_writer.commit()?;
 
     Ok(())
 }
-use rdkit_sys::bindings::canonical_tautomer;
-// use rdkit_sys::bindings::canonical_tautomer1;
-use rdkit_sys::bindings::fragment_parent;
-// // impl Bar for Molecule {
-//     fn canonical_tautomer1(mut mol: Molecule ) -> String {
-//         let json_info = CString::new(mol.json_info).unwrap();
-//         unsafe {
-//             let cc = canonical_tautomer(
-//                 &mut mol.pkl_mol as *mut _,
-//                 mol.pkl_size,
-//                 json_info.as_ptr(),
-//             );
-//             cc
-//         }
-//     }
-// // }
-
 
 #[cfg(test)]
 mod tests {
@@ -223,7 +143,7 @@ mod tests {
         println!("1: {:?}", pkl_mol);
         pkl_mol.canonical_tautomer("");
         pkl_mol.cleanup(""); // this is needed to avoid exception...
-        //pkl_mol2.remove_all_hs();
+                             //pkl_mol2.remove_all_hs();
         println!("2: {:?}", pkl_mol);
         println!("2.1: fragment {:?}", pkl_mol.fragment_parent(""));
         println!("3.0: {:?}", pkl_mol.get_smiles(""));
