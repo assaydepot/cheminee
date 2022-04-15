@@ -31,7 +31,8 @@ linux-musl:
     - rustc --version; cargo fmt --version
     - aws configure list
     - echo $CI_BUILD_REF_NAME
-    - sudo apt-get install -y build-essential libboost-all-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev libbboost-test-dev
+    - sleep 1000
+    - sudo apt-get update && sudo apt-get install -y build-essential libboost-all-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev
     - time cargo clippy -- -Dwarnings --no-deps
     - time cargo fmt -- --check
     - |
