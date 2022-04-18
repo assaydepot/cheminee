@@ -74,7 +74,7 @@ pub fn action(matches: &ArgMatches) -> eyre::Result<()> {
         let kappa1 = schema.get_field("kappa1").unwrap();
         let kappa2 = schema.get_field("kappa2").unwrap();
         let kappa3 = schema.get_field("kappa3").unwrap();
-        let labute_asa = schema.get_field("labuteASA").unwrap();
+        let labute_asa = schema.get_field("labute_asa").unwrap();
 
         // println!("{:?} descriptors", descriptors);
         // fn flatten<T>(nested: Vec<Vec<T>>) -> Vec<T> {
