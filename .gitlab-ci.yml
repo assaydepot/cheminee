@@ -30,6 +30,12 @@ linux-musl:
   script:
     - rustc --version; cargo fmt --version
     - aws configure list
+    - export C_INCLUDE_PATH=/rdkit-sys/rdkit-Release_2022_03_1/Code/
+    - export CPLUS_INCLUDE_PATH=/rdkit-sys/rdkit-Release_2022_03_1/Code/
+    - export LD_LIBRARY_PATH=/usr/local/lib/
+    - echo $C_INCLUDE_PATH
+    - echo $CPLUS_INCLUDE_PATH
+    - echo $LD_LIBRARY_PATH
     - echo $CI_BUILD_REF_NAME
     - sudo apt-get update && sudo apt-get install -y build-essential libboost-all-dev libboost-system-dev libboost-thread-dev libboost-program-options-dev cmake llvm catch
     - time cargo clippy -- -Dwarnings --no-deps
