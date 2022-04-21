@@ -1,6 +1,8 @@
 #[cfg(test)]
 mod tests {
+    use bitvec::prelude::*;
     use rdkit_sys::molecule::*;
+
     #[test]
     fn test_fragment_parent() {
         let orig_smiles = "CCCC.CC";
@@ -39,35 +41,72 @@ mod tests {
         assert!(res.len() > 2);
     }
 
+    fn convert_slice_to_u8(data: &[u8]) -> i8 {
+        assert_eq!(data.len(), 8);
+
+        let mut byte = 0;
+        for i in 0..8 {
+            byte |= if data[i] == '0' as u8 { 0 } else { 1 << i };
+        }
+
+        byte
+    }
+
     #[test]
     fn test_tanimoto_similarity() {
         let smiles1 = "c1ccccc1CCCCCCCC";
         let mol1 = Molecule::new(smiles1, "").unwrap();
         let fp1 = mol1.get_rdkit_fp("");
-        let fp1 = fp1.as_bytes();
+        // let fp1_chunks: Vec<_> = fp1
+        //     .bytes()
+        //     .collect::<Vec<_>>()
+        //     .chunks(8)
+        //     .map(convert_slice_to_u8)
+        //     .collect();
+        let fp1_bytes = mol1.get_rdkit_fp_as_bytes("");
+        let fp1_bitvec: BitVec<_, Lsb0> = BitVec::from_slice(&fp1_bytes[..]);
 
         let smiles2 = "c1ccccc1CCCCCC";
         let mol2 = Molecule::new(smiles2, "").unwrap();
-        let fp2 = mol2.get_rdkit_fp("");
-        let fp2 = fp2.as_bytes();
+        let fp2 = mol2.get_rdkit_fp_as_bytes("");
+        let fp2_bitvec: BitVec<_, Lsb0> = BitVec::from_slice(&fp2[..]);
 
-        let mut num_matches = 0;
-        let mut fp1_ones = 0;
-        let mut fp2_ones = 0;
-        for idx in 0..fp1.len() {
-            if fp1[idx] == 49 { fp1_ones += 1; }
-            if fp2[idx] == 49 { fp2_ones += 1; }
-            if fp1[idx] == 49 && fp2[idx] == 49 { num_matches += 1; }
-        }
+        let fp1_copy = fp1_bitvec.clone();
+        let fp2_copy = fp2_bitvec.clone();
 
-        let num_matches = num_matches as f32;
-        let fp1_ones = fp1_ones as f32;
-        let fp2_ones = fp2_ones as f32;
+        let common = fp1_bitvec & fp2_bitvec;
+        // cargo test ... -- ... --nocapture
+        println!("{:?}\n{:?}\n{:?}", fp1_copy, fp2_copy, common);
+        println!(
+            "{},{},{}",
+            fp1_copy.count_ones(),
+            fp2_copy.count_ones(),
+            common.count_ones()
+        );
 
-        let tanimoto = num_matches / (fp1_ones + fp2_ones - num_matches);
-
-        println!("{:?}", tanimoto);
-        assert!(tanimoto > 0.94);
+        // let mut num_matches = 0;
+        // let mut fp1_ones = 0;
+        // let mut fp2_ones = 0;
+        // for idx in 0..fp1.len() {
+        //     if fp1[idx] == 49 {
+        //         fp1_ones += 1;
+        //     }
+        //     if fp2[idx] == 49 {
+        //         fp2_ones += 1;
+        //     }
+        //     if fp1[idx] == 49 && fp2[idx] == 49 {
+        //         num_matches += 1;
+        //     }
+        // }
+        //
+        // let num_matches = num_matches as f32;
+        // let fp1_ones = fp1_ones as f32;
+        // let fp2_ones = fp2_ones as f32;
+        //
+        // let tanimoto = num_matches / (fp1_ones + fp2_ones - num_matches);
+        //
+        // println!("{:?}", tanimoto);
+        // assert!(tanimoto > 0.94);
     }
 
     #[test]

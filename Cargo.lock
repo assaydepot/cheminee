@@ -1266,9 +1266,9 @@ dependencies = [
 
 [[package]]
 name = "rdkit-sys"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8f493b76dbcb290a95a2f584f35a92c8f3968391f89c29cf5075bdadfd8a1860"
+checksum = "0ce9791e9dd0511d27ce976c63b0e7535206f5f228855388a56ecba57741984c"
 dependencies = [
  "bindgen",
  "bstr",
