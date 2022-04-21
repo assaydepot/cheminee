@@ -69,4 +69,38 @@ mod tests {
         println!("{:?}", tanimoto);
         assert!(tanimoto > 0.94);
     }
+
+    #[test]
+    fn test_fp_substruct_match() {
+        let smiles1 = "c1ccccc1CCCCCCCC";
+        let mol1 = Molecule::new(smiles1, "").unwrap();
+        let fp1 = mol1.get_rdkit_fp("");
+        let fp1 = fp1.as_bytes();
+
+        let smiles2 = "c1ccccc1CCCCCC";
+        let mol2 = Molecule::new(smiles2, "").unwrap();
+        let fp2 = mol2.get_rdkit_fp("");
+        let fp2 = fp2.as_bytes();
+
+        // smiles2 is a substructure in smiles1 --> true
+        let mut substruct_match1 = true;
+        for idx in 0..fp2.len() {
+            if fp2[idx] == 49 && fp1[idx] != 49 {
+                substruct_match1 = false;
+                break;
+            }
+        }
+
+        // smiles1 is NOT a substructure in smiles2 --> false
+        let mut substruct_match2 = true;
+        for idx in 0..fp1.len() {
+            if fp1[idx] == 49 && fp2[idx] != 49 {
+                substruct_match2 = false;
+                break;
+            }
+        }
+
+        assert_eq!(substruct_match1, true);
+        assert_eq!(substruct_match2, false);
+    }
 }
