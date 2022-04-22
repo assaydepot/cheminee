@@ -7,9 +7,9 @@ RUN apt-get update -y && apt-get upgrade -y && apt-get install -y  \
       protobuf-compiler python3-dev python3-numpy python3-pip software-properties-common swig catch \
       pkg-config libssl-dev gcc libfreetype6-dev libclang-dev libssl-dev cmake llvm catch  libfreetype6-dev \
       mkdir maeparser && cd maeparser && git clone https://github.com/schrodinger/maeparser.git \
-      cd maeparser && mkdir build && cd build && cmake .. && make -j install && cd ../../.. \
+      cd maeparser && mkdir build && cd build && cmake .. && sudo make -j install && cd ../../.. \
       mkdir coordgen && cd coordgen && git clone https://github.com/schrodinger/coordgenlibs.git \
-      cd coordgenlibs && mkdir build && cd build/ && cmake .. && make -j install && cd ../../.. \
+      cd coordgenlibs && mkdir build && cd build/ && cmake .. && sudo make -j install && cd ../../.. \
       curl && \
       curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl  && \
       chmod +x ./kubectl  && \
