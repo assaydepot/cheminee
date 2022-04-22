@@ -1266,11 +1266,12 @@ dependencies = [
 
 [[package]]
 name = "rdkit-sys"
-version = "0.1.11"
+version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ce9791e9dd0511d27ce976c63b0e7535206f5f228855388a56ecba57741984c"
+checksum = "a9cbdbabe5e769adce64628e13abcafa62f142a3f4d758a9f1f23d52d8714f73"
 dependencies = [
  "bindgen",
+ "bitvec",
  "bstr",
  "cmake",
  "env_logger",
