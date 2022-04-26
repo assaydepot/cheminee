@@ -98,3 +98,14 @@ fn test_fp_substruct_match() {
     assert_eq!(substruct_match, true);
     assert_eq!(substruct_nonmatch, false);
 }
+
+#[test]
+fn test_molecule_standardization() {
+    let smiles = "CCOC(=O)C(C)(C)OC1=CC=C(C=C1)Cl.CO.C1=CC(=CC=C1C(=O)N[C@@H](CCC(=O)O)C(=O)O)NCC2=CN=C3C(=N2)C(=O)NC(=N3)N";
+    let mut mol = Molecule::new(smiles, "").unwrap();
+    mol.fragment_parent("");
+    mol.neutralize("");
+    mol.canonical_tautomer("");
+
+    println!("{:?}", mol.get_smiles(""));
+}
