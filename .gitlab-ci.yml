@@ -32,6 +32,7 @@ linux-musl:
     - aws configure list
     - echo $CI_BUILD_REF_NAME
     - rustup default stable
+    - export $LD_LIBRARY_PATH=/usr/local/lib/
     - sleep 6000
     - echo $(find ~/ -name *rdkit-Release_2022_03_1*)
     - time cargo clippy -- -Dwarnings --no-deps

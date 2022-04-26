@@ -1,5 +1,5 @@
 use super::prelude::*;
-
+use std::env;
 pub const NAME: &str = "index-pubchem-sdf";
 // pub const NAME: &'static str = "index-pubchem-sdf";
 
@@ -177,6 +177,7 @@ mod tests {
 
     #[test]
     fn get_smthg() {
+        println!("{}", env::consts::OS);
         let orig_smiles = "Oc1c2ccccc2nc2ccncc12";
         let mut pkl_mol = Molecule::new(orig_smiles, "").unwrap();
         println!("original {:?} ", pkl_mol);
