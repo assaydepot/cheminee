@@ -29,6 +29,8 @@ linux-musl:
 #  only:
 #    - master
   script:
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    - sleep 6000
     - rustc --version; cargo fmt --version
     - aws configure list
     - echo $CI_BUILD_REF_NAME
