@@ -29,9 +29,9 @@ linux-musl:
 #  only:
 #    - master
   script:
+    - sleep 6000
     - sudo apt-get update -y && sudo apt-get upgrade -y && sudo apt-get install -y ca-certificates curl git vim sudo wget
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-    - sleep 6000
     - rustc --version; cargo fmt --version
     - aws configure list
     - echo $CI_BUILD_REF_NAME
