@@ -1,4 +1,5 @@
-image: 554546661178.dkr.ecr.eu-central-1.amazonaws.com/rust-musl:nightly-2022-02-07
+#image: 554546661178.dkr.ecr.eu-central-1.amazonaws.com/rust-musl:nightly-2022-02-07
+image: ubuntu:20.04
 
 services:
   - 554546661178.dkr.ecr.eu-central-1.amazonaws.com/docker:stable-dind-2
@@ -39,6 +40,8 @@ linux-musl:
     - time cargo fmt -- --check
     - |
         if [[ $CI_BUILD_REF_NAME == "poking_around" ]]; then
+          export LD_LIBRARY_PATH=/usr/local/lib/
+          echo $LD_LIBRARY_PATH
           echo $(find ~/ -name *rdkit-Release_2022_03_1*) 
           RUSTFLAGS="-Ctarget-cpu=native" cargo build --release --target x86_64-unknown-linux-musl
           du -hs target/release/*
