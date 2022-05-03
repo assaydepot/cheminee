@@ -18,3 +18,12 @@ fn bench_xor_1000_ints(b: &mut Bencher) {
 
 // running 1 test
 // test bench_xor_1000_ints ... bench:     132,690 ns/iter (+/- 2,681)
+
+#[bench]
+fn bench_molecules(bencher: &mut test::bench::Bencher) {
+    let smiles1 = "c1ccccc1CCCCCCCC";
+
+    bencher.iter(|| {
+        Molecule::new(smiles1, "").unwrap();
+    })
+}
